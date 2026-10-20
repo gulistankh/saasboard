@@ -271,6 +271,7 @@ const getDemoPasswordHash = () => {
 };
 
 export const startDemo = asyncHandler(async (req, res) => {
+  await Demo.deleteExpiredDemos().catch(() => {});
   if ((await Demo.countDemoWorkspaces()) >= MAX_DEMO_WORKSPACES) {
     await Demo.deleteExpiredDemos();
     if ((await Demo.countDemoWorkspaces()) >= MAX_DEMO_WORKSPACES) {

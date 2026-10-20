@@ -8,7 +8,11 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 
 // backend/uploads/avatars
 export const AVATAR_DIR = path.resolve(here, "../../uploads/avatars");
-fs.mkdirSync(AVATAR_DIR, { recursive: true });
+try {
+  fs.mkdirSync(AVATAR_DIR, { recursive: true });
+} catch {
+  // Read-only filesystem (serverless hosting): avatar uploads are unavailable there
+}
 
 const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
 
