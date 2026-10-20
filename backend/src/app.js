@@ -12,7 +12,7 @@ const app = express();
 
 // Behind a proxy (Render, Railway, Nginx) the limiter needs the real client IP.
 // Uncomment when you deploy:
-// app.set("trust proxy", 1);
+app.set("trust proxy", 1);
 
 app.disable("x-powered-by");
 app.use(helmet());
