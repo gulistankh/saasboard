@@ -2,9 +2,9 @@ const KEY = "theme"; // "light" | "dark" | "system"
 
 export const getStoredTheme = () => {
   try {
-    return localStorage.getItem(KEY) || "light";
+    return localStorage.getItem(KEY) || "dark";
   } catch {
-    return "light";
+    return "dark";
   }
 };
 

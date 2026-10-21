@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import Select from "../../components/ui/Select";
 import useAuth from "../../hooks/useAuth";
 import { getErrorMessage } from "../../services/api";
 import {
@@ -20,10 +21,15 @@ import {
 
 const ROLES = ["member", "admin"];
 
+const ROLE_OPTIONS = ROLES.map((role) => ({
+  value: role,
+  label: capitalize(role),
+}));
+
 export default function Team() {
   const { user } = useAuth();
-
   const isAdmin = user?.role === "admin";
+
   const [members, setMembers] = useState([]);
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +40,7 @@ export default function Team() {
   const [inviting, setInviting] = useState(false);
   // id of the member/invite currently being changed (disables its buttons)
   const [busyId, setBusyId] = useState(null);
-    // What the confirmation dialog is asking about: { type: "member" | "invite", item }
+  // What the confirmation dialog is asking about: { type: "member" | "invite", item }
   const [confirmTarget, setConfirmTarget] = useState(null);
 
   const loadData = useCallback(async () => {
@@ -52,7 +58,7 @@ export default function Team() {
     } finally {
       setLoading(false);
     }
-    }, [isAdmin]);
+  }, [isAdmin]);
 
   useEffect(() => {
     loadData();
@@ -95,7 +101,9 @@ export default function Team() {
       setMembers((prev) =>
         prev.map((m) => (m.id === member.id ? { ...m, ...updated } : m))
       );
-      setSuccess(`${member.name} is now ${role === "admin" ? "an Admin" : "a Member"}.`);
+      setSuccess(
+        `${member.name} is now ${role === "admin" ? "an Admin" : "a Member"}.`
+      );
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -164,46 +172,41 @@ export default function Team() {
       )}
       {success && <div style={styles.success}>{success}</div>}
 
-      {/* Invite form */}
-      <div style={styles.panel}>
-        <h3 style={styles.panelTitle}>Invite a teammate</h3>
-        <form onSubmit={handleInvite} noValidate style={styles.inviteForm}>
-          <input
-            type="email"
-            aria-label="Email to invite"
-            placeholder="teammate@company.com"
-            value={inviteForm.email}
-            onChange={(event) =>
-              setInviteForm((prev) => ({ ...prev, email: event.target.value }))
-            }
-            style={{ ...styles.input, flex: "1 1 240px" }}
-          />
-          <select
-            aria-label="Role for the invited user"
-            value={inviteForm.role}
-            onChange={(event) =>
-              setInviteForm((prev) => ({ ...prev, role: event.target.value }))
-            }
-            style={styles.select}
-          >
-            {ROLES.map((role) => (
-              <option key={role} value={role}>
-                {capitalize(role)}
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            disabled={inviting}
-            style={{
-              ...styles.primaryButton,
-              ...(inviting ? styles.disabled : {}),
-            }}
-          >
-            {inviting ? "Sending..." : "Send invite"}
-          </button>
-        </form>
-      </div>
+      {/* Invite form (admins only) */}
+      {isAdmin && (
+        <div style={styles.panel}>
+          <h3 style={styles.panelTitle}>Invite a teammate</h3>
+          <form onSubmit={handleInvite} noValidate style={styles.inviteForm}>
+            <input
+              type="email"
+              aria-label="Email to invite"
+              placeholder="teammate@company.com"
+              value={inviteForm.email}
+              onChange={(event) =>
+                setInviteForm((prev) => ({ ...prev, email: event.target.value }))
+              }
+              style={{ ...styles.input, flex: "1 1 240px" }}
+            />
+            <Select
+              ariaLabel="Role for the invited user"
+              value={inviteForm.role}
+              onChange={(role) => setInviteForm((prev) => ({ ...prev, role }))}
+              options={ROLE_OPTIONS}
+              width={130}
+            />
+            <button
+              type="submit"
+              disabled={inviting}
+              style={{
+                ...styles.primaryButton,
+                ...(inviting ? styles.disabled : {}),
+              }}
+            >
+              {inviting ? "Sending..." : "Send invite"}
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Members */}
       <div style={styles.panel}>
@@ -243,36 +246,29 @@ export default function Team() {
                           </div>
                         </div>
                       </td>
-                                            <td style={styles.td}>
+                      <td style={styles.td}>
                         {isAdmin ? (
-                          <select
-                            aria-label={`Role for ${member.name}`}
+                          <Select
+                            ariaLabel={`Role for ${member.name}`}
                             value={member.role}
                             disabled={isSelf || busy}
-                            onChange={(event) =>
-                              handleRoleChange(member, event.target.value)
-                            }
-                            style={styles.select}
-                          >
-                            {ROLES.map((role) => (
-                              <option key={role} value={role}>
-                                {capitalize(role)}
-                              </option>
-                            ))}
-                          </select>
+                            onChange={(role) => handleRoleChange(member, role)}
+                            options={ROLE_OPTIONS}
+                            width={130}
+                          />
                         ) : (
                           capitalize(member.role)
                         )}
                       </td>
-                      <td style={styles.td}>
-                        {formatDate(member.joinedAt)}
-                      </td>
+                      <td style={styles.td}>{formatDate(member.joinedAt)}</td>
                       <td style={{ ...styles.td, textAlign: "right" }}>
-                          {isAdmin && !isSelf && (
+                        {isAdmin && !isSelf && (
                           <button
                             type="button"
                             disabled={busy}
-                            onClick={() => setConfirmTarget({ type: "member", item: member })}
+                            onClick={() =>
+                              setConfirmTarget({ type: "member", item: member })
+                            }
                             style={styles.dangerButton}
                           >
                             Remove
@@ -288,60 +284,64 @@ export default function Team() {
         )}
       </div>
 
-      {/* Pending invites */}
-      <div style={styles.panel}>
-        <h3 style={styles.panelTitle}>Pending invites ({invites.length})</h3>
-        {loading ? (
-          <p style={styles.muted}>Loading...</p>
-        ) : invites.length === 0 ? (
-          <p style={styles.muted}>No pending invites.</p>
-        ) : (
-          <div style={styles.tableWrap}>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>Email</th>
-                  <th style={styles.th}>Role</th>
-                  <th style={styles.th}>Sent</th>
-                  <th style={styles.th} />
-                </tr>
-              </thead>
-              <tbody>
-                {invites.map((invite) => {
-                  const busy = busyId === invite.id;
-                  return (
-                    <tr key={invite.id}>
-                      <td style={styles.td}>{invite.email}</td>
-                      <td style={styles.td}>{capitalize(invite.role)}</td>
-                      <td style={styles.td}>{formatDate(invite.createdAt)}</td>
-                      <td style={{ ...styles.td, textAlign: "right" }}>
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => handleResend(invite)}
-                          style={styles.linkButton}
-                        >
-                          Resend
-                        </button>
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => setConfirmTarget({ type: "invite", item: invite })}
-                          style={styles.dangerButton}
-                        >
-                          Cancel
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {/* Pending invites (admins only) */}
+      {isAdmin && (
+        <div style={styles.panel}>
+          <h3 style={styles.panelTitle}>Pending invites ({invites.length})</h3>
+          {loading ? (
+            <p style={styles.muted}>Loading...</p>
+          ) : invites.length === 0 ? (
+            <p style={styles.muted}>No pending invites.</p>
+          ) : (
+            <div style={styles.tableWrap}>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Email</th>
+                    <th style={styles.th}>Role</th>
+                    <th style={styles.th}>Sent</th>
+                    <th style={styles.th} />
+                  </tr>
+                </thead>
+                <tbody>
+                  {invites.map((invite) => {
+                    const busy = busyId === invite.id;
+                    return (
+                      <tr key={invite.id}>
+                        <td style={styles.td}>{invite.email}</td>
+                        <td style={styles.td}>{capitalize(invite.role)}</td>
+                        <td style={styles.td}>{formatDate(invite.createdAt)}</td>
+                        <td style={{ ...styles.td, textAlign: "right" }}>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => handleResend(invite)}
+                            style={styles.linkButton}
+                          >
+                            Resend
+                          </button>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() =>
+                              setConfirmTarget({ type: "invite", item: invite })
+                            }
+                            style={styles.dangerButton}
+                          >
+                            Cancel
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
-            <ConfirmDialog
+      <ConfirmDialog
         open={Boolean(confirmTarget)}
         title={
           confirmTarget?.type === "member"
@@ -358,7 +358,9 @@ export default function Team() {
         confirmLabel={
           confirmTarget?.type === "member" ? "Remove member" : "Cancel invitation"
         }
-        cancelLabel={confirmTarget?.type === "member" ? "Cancel" : "Keep invitation"}
+        cancelLabel={
+          confirmTarget?.type === "member" ? "Cancel" : "Keep invitation"
+        }
         busy={busyId !== null}
         onConfirm={() =>
           confirmTarget.type === "member"
@@ -410,14 +412,6 @@ const styles = {
     borderRadius: 8,
     outline: "none",
     boxSizing: "border-box",
-  },
-  select: {
-    padding: "8px 10px",
-    fontSize: 14,
-    border: "1px solid var(--border-input)",
-    borderRadius: 8,
-    background: "var(--surface)",
-    color: "var(--text-2)",
   },
   primaryButton: {
     padding: "10px 16px",
