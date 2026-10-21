@@ -5,6 +5,7 @@
 SaaSBoard is a multi-tenant SaaS starter built with React, Node.js and PostgreSQL. It covers the parts founders most often get wrong: authentication, email verification, password reset, role-based access, team invites and strict workspace isolation, with a live dashboard on top.
 
 - **Live demo:** https://saasboard-app.vercel.app (click **Try the demo**, no sign-up needed)
+- **Case study:** [Read how it was built](docs/case-study.md)
 - **Video walkthrough:** coming soon
 
 > The free-tier server may sleep when idle, so the first load can take up to a minute.
