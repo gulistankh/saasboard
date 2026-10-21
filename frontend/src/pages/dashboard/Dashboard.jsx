@@ -1,3 +1,4 @@
+import Select from "../../components/ui/Select";
 import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, FolderKanban, ListTodo, Users } from "lucide-react";
 import BarChartCard from "../../components/charts/BarChartCard";
@@ -93,18 +94,13 @@ export default function Dashboard() {
   }, [range]);
 
   const rangePicker = (
-    <select
+    <Select
+      ariaLabel="Select time range"
       value={range}
-      onChange={(event) => setRange(event.target.value)}
-      aria-label="Select time range"
-      style={styles.select}
-    >
-      {RANGES.map((item) => (
-        <option key={item.value} value={item.value}>
-          {item.label}
-        </option>
-      ))}
-    </select>
+      onChange={setRange}
+      options={RANGES}
+      width={150}
+    />
   );
 
   const firstName = user?.name?.split(" ")[0] || "";
@@ -306,14 +302,6 @@ const styles = {
   },
   panelTitle: { margin: "0 0 16px", fontSize: 16, color: "var(--text)" },
   muted: { margin: 0, fontSize: 14, color: "var(--text-muted)" },
-  select: {
-    padding: "6px 10px",
-    fontSize: 13,
-    border: "1px solid var(--border-input)",
-    borderRadius: 8,
-    background: "var(--surface)",
-    color: "var(--text-2)",
-  },
   feed: { listStyle: "none", margin: 0, padding: 0 },
   feedItem: {
     padding: "10px 0",
