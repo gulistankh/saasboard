@@ -2,9 +2,15 @@
 
 **A multi-tenant team workspace and analytics dashboard, built end to end.**
 
-[Live demo](https://saasboard-app.vercel.app) · [Source code](https://github.com/gulistankh/saasboard) · Video walkthrough (coming soon)
+[Live demo](https://saasboard-app.vercel.app) · [Source code](https://github.com/gulistankh/saasboard) · [Video walkthrough](https://youtu.be/8YKRoAE_wNg)
 
 ![Dashboard in dark mode](dashboard-dark.png)
+
+## Watch it in action
+
+[![Watch the SaaSBoard demo](https://img.youtube.com/vi/8YKRoAE_wNg/maxresdefault.jpg)](https://youtu.be/8YKRoAE_wNg)
+
+▶️ **[Watch the 100-second walkthrough](https://youtu.be/8YKRoAE_wNg)**
 
 ## The short version
 
