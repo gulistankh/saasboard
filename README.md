@@ -6,9 +6,17 @@ SaaSBoard is a multi-tenant SaaS starter built with React, Node.js and PostgreSQ
 
 - **Live demo:** https://saasboard-app.vercel.app (click **Try the demo**, no sign-up needed)
 - **Case study:** [Read how it was built](docs/case-study.md)
-- **Video walkthrough:** coming soon
+- **Video walkthrough:** [Watch the 100-second demo](https://youtu.be/8YKRoAE_wNg)
 
 > The free-tier server may sleep when idle, so the first load can take up to a minute.
+
+---
+
+## 🎥 Demo video
+
+[![Watch the SaaSBoard demo](https://img.youtube.com/vi/8YKRoAE_wNg/maxresdefault.jpg)](https://youtu.be/8YKRoAE_wNg)
+
+▶️ **[Watch the 100-second walkthrough](https://youtu.be/8YKRoAE_wNg)** · **[Try the live demo](https://saasboard-app.vercel.app)**
 
 ---
 
